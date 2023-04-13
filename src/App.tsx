@@ -4,6 +4,7 @@ import { Route, Routes } from "react-router";
 import Home from "./pages/Home";
 import CreateGame from "./pages/CreateGame";
 import SubmitAnswer from "./pages/SubmitAnswer";
+import Answer from "./pages/Answer";
 export interface Istate {
   playerList: string[];
   numberOfRounds: number;
@@ -31,11 +32,14 @@ function App() {
         ></Route>
         <Route
           path="/submit-answer"
-          element={<SubmitAnswer
-          numberOfRounds={numberOfRounds}
-          playerList={playerList}
-          ></SubmitAnswer>}
+          element={
+            <SubmitAnswer
+              numberOfRounds={numberOfRounds}
+              playerList={playerList}
+            ></SubmitAnswer>
+          }
         ></Route>
+        <Route path="/answer" element={<Answer></Answer>}></Route>
       </Routes>
     </>
   );

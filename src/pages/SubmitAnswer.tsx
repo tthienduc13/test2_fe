@@ -7,14 +7,14 @@ interface Iprops {
 }
 function SubmitAnswer({ playerList, numberOfRounds }: Iprops) {
   const navigate = useNavigate();
-  const [playerIndex, setPlayerIndex] = useState<number>(1);
+  const [playerIndex, setPlayerIndex] = useState<number>(0);
   const [active, setActive] = useState<boolean>(false);
   const rounds = Array.from(Array(numberOfRounds).keys());
   const handleSubmit = () => {
     const nextPlayerIndex = (playerIndex + 1) % playerList.length;
     setPlayerIndex(nextPlayerIndex);
     if (nextPlayerIndex === 0) {
-      navigate("/");
+      navigate("/answer");
     }
   };
   return (
