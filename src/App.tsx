@@ -6,9 +6,13 @@ import CreateGame from "./pages/CreateGame";
 import SubmitAnswer from "./pages/SubmitAnswer";
 export interface Istate {
   playerList: string[];
+  numberOfRounds: number;
 }
 function App() {
   const [playerList, setPlayerList] = useState<Istate["playerList"]>([]);
+  const [numberOfRounds, setNumberOfRounds] = useState<
+    Istate["numberOfRounds"]
+  >(Number(""));
   console.log(playerList);
   return (
     <>
@@ -18,14 +22,19 @@ function App() {
           path="/create-game"
           element={
             <CreateGame
+              numberOfRounds={numberOfRounds}
               playerList={playerList}
               setPlayerList={setPlayerList}
+              setNumberOfRounds={setNumberOfRounds}
             ></CreateGame>
           }
         ></Route>
         <Route
           path="/submit-answer"
-          element={<SubmitAnswer></SubmitAnswer>}
+          element={<SubmitAnswer
+          numberOfRounds={numberOfRounds}
+          playerList={playerList}
+          ></SubmitAnswer>}
         ></Route>
       </Routes>
     </>
