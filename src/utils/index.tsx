@@ -10,6 +10,5 @@ export function isValidInput(input: string): boolean {
 }
 
 export const isValidNumberOfRounds = (value: number): boolean => {
-  // Check if the value is a number and is greater than 0
   return typeof value === "number" && value > 0 && value <= 10;
 };

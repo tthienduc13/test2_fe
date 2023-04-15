@@ -37,7 +37,7 @@ function CreateGame({
   };
   const addPlayer = () => {
     if (isValidInput(player) && playerList.length < 2) {
-      setPlayerList([...playerList, player]);
+      setPlayerList([...playerList, { playerName: player, answer: [] }]);
       setPlayer("");
       setShowPlayerTable(!showPlayerTable);
       setShowAddPlayerTable(!showAddPlayerTable);
@@ -88,7 +88,10 @@ function CreateGame({
             <div className="w-1/2 py-2 text-center">Player</div>
           </div>
           {playerList.map((player, index) => (
-            <div className="flex flex-row border-2 border-t-0 border-black">
+            <div
+              key={index}
+              className="flex flex-row border-2 border-t-0 border-black"
+            >
               <div className="border-r-2 border-black w-1/2 py-2 text-center relative">
                 {index + 1}
                 <div
@@ -98,7 +101,7 @@ function CreateGame({
                   <i className="fa-solid fa-trash-can"></i>
                 </div>
               </div>
-              <div className="w-1/2 py-2 text-center">{player}</div>
+              <div className="w-1/2 py-2 text-center">{player.playerName}</div>
             </div>
           ))}
           <button

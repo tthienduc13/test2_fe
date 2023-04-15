@@ -1,12 +1,20 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-function Answer() {
+import { Istate as Props } from "../App";
+interface Iprops {
+  playerList: Props["playerList"];
+  numberOfRounds: Props["numberOfRounds"];
+  correctAnswer: Props["correctAnswer"];
+}
+function Answer({ playerList, numberOfRounds, correctAnswer }: Props) {
   const navigate = useNavigate();
+  const rounds = Array.from(Array(numberOfRounds).keys());
   const handleSummary = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     navigate("/result");
   };
+
   return (
     <>
       <div className="w-full h-full p-4 ">
@@ -15,21 +23,37 @@ function Answer() {
         </div>
         <div className="flex flex-row text-lg items-end justify-center sm:justify-start font-medium mb-16">
           <p className="text-lg">Player:</p>
-          <div className="text-lg text-red-500">duc</div>
-          <div className="text-lg text-green-500">thang</div>
+          {playerList.map((player, index) => (
+            <>
+              <div
+                className="text-lg"
+                style={{ color: index === 0 ? "red" : "green" }}
+              >
+                {player.playerName}
+                {index === 0 ? ", " : ""}
+              </div>
+            </>
+          ))}
         </div>
         <div className="flex sm:flex-row flex-col flex-wrap w-full justify-start sm:gap-10 gap-2 sm:mb-8 mb-2">
-          <div className="sm:w-[30%] w-full flex flex-col justify-center">
-            <span> Round 1:</span>
-            <div className="flex flex-col p-2 bg-[#d5d5d5] mt-1">
-              <p className="text-lg">Result: NO</p>
-              <div className="text-lg flex-row flex">
-                Winner:
-                <div className="text-lg text-red-500">duc</div>
-                <div className="text-lg text-green-500">thang</div>
+          {rounds.map((round, index) => (
+            <div
+              key={index}
+              className="sm:w-[30%] w-full flex flex-col justify-center"
+            >
+              <span> Round {index + 1}:</span>
+              <div className="flex flex-col p-2 bg-[#d5d5d5] mt-1">
+                <p className="text-lg uppercase">
+                  Result: {correctAnswer[index]}
+                </p>
+                <div className="text-lg flex-row flex">
+                  Winner:
+                  {/* <div className="text-lg text-red-500">duc</div>
+                  <div className="text-lg text-green-500">thang</div> */}
+                </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
         <button
           onClick={(e) => handleSummary(e)}

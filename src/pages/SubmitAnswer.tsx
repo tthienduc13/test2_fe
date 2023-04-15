@@ -1,22 +1,63 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Istate as Props } from "../App";
 import { useNavigate } from "react-router";
+import { getResult } from "../apis";
+
 interface Iprops {
   playerList: Props["playerList"];
   numberOfRounds: Props["numberOfRounds"];
+  setCorrectAnswer: React.Dispatch<
+    React.SetStateAction<Props["correctAnswer"]>
+  >;
+  correctAnswer: Props["correctAnswer"];
+  setPlayerList: React.Dispatch<React.SetStateAction<Props["playerList"]>>;
 }
-function SubmitAnswer({ playerList, numberOfRounds }: Iprops) {
+
+function SubmitAnswer({
+  playerList,
+  numberOfRounds,
+  setCorrectAnswer,
+  correctAnswer,
+  setPlayerList,
+}: Iprops) {
   const navigate = useNavigate();
   const [playerIndex, setPlayerIndex] = useState<number>(0);
-  const [active, setActive] = useState<boolean>(false);
+  const [userResponse, setUserResponse] = useState([
+    { index: 0, response: "" },
+  ]);
   const rounds = Array.from(Array(numberOfRounds).keys());
-  const handleSubmit = () => {
+
+  const handleClick = (index: number, response: string) => {
+    const updatedUserResponse = [...userResponse];
+    updatedUserResponse[index] = { index: index, response: response };
+    setUserResponse(updatedUserResponse);
+
+    const updatedPlayerList = [...playerList]; //get a copy array
+    const currentPlayer = updatedPlayerList[playerIndex]; //choose the current player
+    currentPlayer.answer = [...currentPlayer.answer];
+    currentPlayer.answer[index] = response;
+    updatedPlayerList[playerIndex] = currentPlayer;
+    setPlayerList(updatedPlayerList);
+  };
+  useEffect(() => {
+    setUserResponse([...userResponse.slice(0, rounds.length)]);
+  }, [rounds.length]);
+
+  const handleSubmit = async () => {
     const nextPlayerIndex = (playerIndex + 1) % playerList.length;
     setPlayerIndex(nextPlayerIndex);
+
     if (nextPlayerIndex === 0) {
+      const correctAnswers: string[] = [];
+      for (let i = 0; i < rounds.length; i++) {
+        const answer = await getResult();
+        correctAnswers.push(answer);
+      }
+      await setCorrectAnswer(correctAnswers);
       navigate("/answer");
     }
   };
+
   return (
     <>
       <div className="w-full h-full p-4 ">
@@ -27,19 +68,30 @@ function SubmitAnswer({ playerList, numberOfRounds }: Iprops) {
           <>
             {index === playerIndex && (
               <>
-                <div className="text-lg mb-16 sm:text-start text-center">
-                  <p className="text-lg font-medium">{player}'s turn</p>
+                <div
+                  key={index}
+                  className="text-lg mb-16 sm:text-start text-center"
+                >
+                  <p className="text-lg font-medium">
+                    {player.playerName}'s turn
+                  </p>
                 </div>
                 <div className="flex sm:flex-row flex-col flex-wrap w-full justify-start sm:gap-10 gap:2 sm:mb-8 mb-2">
                   {rounds.map((round, index) => (
                     <div className="sm:w-[30%] w-full flex flex-col sm:mb-8 mb-2">
                       <span>Round {index + 1}:</span>
                       <div className="flex flex-row justify-between">
-                        <button className="w-[49%] text-green-500 text-lg px-2 py-1 border-2 border-black">
+                        <button
+                          className="w-[49%] text-green-500 text-lg px-2 py-1 border-2 border-black"
+                          onClick={() => handleClick(index, "Yes")}
+                        >
                           <i className="fa-solid fa-check mr-2"></i>
                           Yes
                         </button>
-                        <button className="w-[49%] text-red-500 text-lg px-2 py-1 border-2 border-black">
+                        <button
+                          className="w-[49%] text-red-500 text-lg px-2 py-1 border-2 border-black"
+                          onClick={() => handleClick(index, "No")}
+                        >
                           <i className="fa-solid fa-xmark mr-2"></i>
                           No
                         </button>
