@@ -22,10 +22,10 @@ function SubmitAnswer({
 }: Iprops) {
   const navigate = useNavigate();
   const [playerIndex, setPlayerIndex] = useState<number>(0);
-  const [userResponse, setUserResponse] = useState([
-    { index: 0, response: "" },
-  ]);
   const rounds = Array.from(Array(numberOfRounds).keys());
+  const [userResponse, setUserResponse] = useState(
+    rounds.map((index) => ({ index, response: "" }))
+  );
 
   const handleClick = (index: number, response: string) => {
     const updatedUserResponse = [...userResponse];
@@ -39,22 +39,26 @@ function SubmitAnswer({
     updatedPlayerList[playerIndex] = currentPlayer;
     setPlayerList(updatedPlayerList);
   };
-  useEffect(() => {
-    setUserResponse([...userResponse.slice(0, rounds.length)]);
-  }, [rounds.length]);
 
   const handleSubmit = async () => {
     const nextPlayerIndex = (playerIndex + 1) % playerList.length;
     setPlayerIndex(nextPlayerIndex);
 
     if (nextPlayerIndex === 0) {
-      const correctAnswers: string[] = [];
-      for (let i = 0; i < rounds.length; i++) {
-        const answer = await getResult();
-        correctAnswers.push(answer);
+      try {
+        const correctAnswers: string[] = [];
+        for (let i = 0; i < rounds.length; i++) {
+          const answer = await getResult();
+          correctAnswers.push(answer);
+        }
+        setCorrectAnswer(correctAnswers);
+        navigate("/answer");
+      } catch (error) {
+        console.log(error);
+        alert(
+          "An error occurred while fetching the data. Please try again later."
+        );
       }
-      await setCorrectAnswer(correctAnswers);
-      navigate("/answer");
     }
   };
 

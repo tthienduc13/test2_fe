@@ -6,15 +6,45 @@ interface Iprops {
   numberOfRounds: Props["numberOfRounds"];
   correctAnswer: Props["correctAnswer"];
 }
+
+interface IWinner {
+  playerName: string;
+  round: number;
+}
 function Answer({ playerList, numberOfRounds, correctAnswer }: Props) {
   const navigate = useNavigate();
   const rounds = Array.from(Array(numberOfRounds).keys());
+  const [winners, setWinners] = useState<IWinner[]>([]);
+
+  const getWinnerList = () => {
+    const matches: IWinner[] = [];
+
+    for (let i = 0; i < rounds.length; i++) {
+      matches.push({ playerName: getWinCurrent(i), round: i + 1 });
+    }
+    setWinners(matches);
+  };
+
+  const getWinCurrent = (index: number) => {
+    const result: string[] = [];
+    playerList.map((player) => {
+      if (player.answer[index] === correctAnswer[index]) {
+        result.push(player.playerName);
+      }
+    });
+
+    return result.join(" , ");
+  };
+
+  useEffect(() => {
+    getWinnerList();
+  }, [correctAnswer]);
+
   const handleSummary = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     navigate("/result");
   };
-
   return (
     <>
       <div className="w-full h-full p-4 ">
@@ -47,9 +77,7 @@ function Answer({ playerList, numberOfRounds, correctAnswer }: Props) {
                   Result: {correctAnswer[index]}
                 </p>
                 <div className="text-lg flex-row flex">
-                  Winner:
-                  {/* <div className="text-lg text-red-500">duc</div>
-                  <div className="text-lg text-green-500">thang</div> */}
+                  Winner: {winners?.[index]?.playerName || "Empty"}
                 </div>
               </div>
             </div>

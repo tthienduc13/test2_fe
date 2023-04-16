@@ -5,11 +5,12 @@ interface YesNoResponse {
 }
 export async function getResult() {
   try {
-    const response = await axios.get<YesNoResponse>(`https://yesno.wtf/api?`);
+    const response = await axios.get<YesNoResponse>("https://yesno.wtf/api");
     console.log(response.data.answer);
     return response.data.answer;
   } catch (error) {
     console.log(error);
-    return "no";
+    alert("Error: Could not retrieve answer. Please try again later.");
+    return "Empty";
   }
 }

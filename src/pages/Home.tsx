@@ -3,9 +3,9 @@ import React from "react";
 function Home() {
   return (
     <>
-      <div className="w-full h-full flex flex-col justify-center items-center">
-        <h1 className="text-3xl mt-20">Yes No WTF Game</h1>
-        <div className="text-xl mt-8 w-[800px] text-center">
+      <div className="max-w-[800px] flex flex-col items-center mx-auto">
+        <h1 className="text-4xl py-20 text-center px-2">Yes No WTF Game</h1>
+        <div className="text-center mb-20 px-2">
           Yes or No is a fun and addicting game, perfect for playing on your own
           or with friends or family, This game contains hundreds of the best
           hand picked Yes or No questions. Vote which option you prefer and view

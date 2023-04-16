@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Istate as Props } from "../App";
 import { useNavigate } from "react-router";
 import { isValidInput, isValidNumberOfRounds } from "../utils";
@@ -37,7 +37,16 @@ function CreateGame({
   };
   const addPlayer = () => {
     if (isValidInput(player) && playerList.length < 2) {
-      setPlayerList([...playerList, { playerName: player, answer: [] }]);
+      const createdAt =
+        new Date().getDate() +
+        "/" +
+        (new Date().getMonth() + 1) +
+        "-" +
+        new Date().toLocaleTimeString();
+      setPlayerList([
+        ...playerList,
+        { playerName: player, answer: [], score: 0, createdAt },
+      ]);
       setPlayer("");
       setShowPlayerTable(!showPlayerTable);
       setShowAddPlayerTable(!showAddPlayerTable);
@@ -55,15 +64,18 @@ function CreateGame({
       alert("Please enter a number!");
     }
   };
+
   const handleCancel = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setShowPlayerTable(!showPlayerTable);
     setShowAddPlayerTable(!showAddPlayerTable);
   };
+
   const handleDelete = (index: number) => {
     console.log(index);
     const newPlayerList = playerList.filter((value, id) => index !== id);
     setPlayerList(newPlayerList);
   };
+
   const handleEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.code === "Enter") {
       addPlayer();
