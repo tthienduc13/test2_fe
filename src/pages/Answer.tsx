@@ -1,35 +1,41 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { Istate as Props } from "../App";
+
 interface Iprops {
   playerList: Props["playerList"];
   numberOfRounds: Props["numberOfRounds"];
+  setPlayerList: React.Dispatch<React.SetStateAction<Props["playerList"]>>;
   correctAnswer: Props["correctAnswer"];
+  setCorrectAnswer: React.Dispatch<
+    React.SetStateAction<Props["correctAnswer"]>
+  >;
 }
-
-interface IWinner {
-  playerName: string;
-  round: number;
-}
-function Answer({ playerList, numberOfRounds, correctAnswer }: Props) {
+function Answer({
+  playerList,
+  numberOfRounds,
+  setPlayerList,
+  correctAnswer,
+  setCorrectAnswer,
+}: Iprops) {
   const navigate = useNavigate();
   const rounds = Array.from(Array(numberOfRounds).keys());
-  const [winners, setWinners] = useState<IWinner[]>([]);
-
+  const [winners, setWinners] = useState<string[]>([]);
   const getWinnerList = () => {
-    const matches: IWinner[] = [];
-
+    const matches = [];
     for (let i = 0; i < rounds.length; i++) {
-      matches.push({ playerName: getWinCurrent(i), round: i + 1 });
+      matches.push(getCurrentWinner(i));
     }
     setWinners(matches);
   };
-
-  const getWinCurrent = (index: number) => {
+  console.log(playerList[0].answer);
+  const getCurrentWinner = (i: number) => {
     const result: string[] = [];
     playerList.map((player) => {
-      if (player.answer[index] === correctAnswer[index]) {
+      console.log(correctAnswer[i]);
+      if (player.answer[i] === correctAnswer[i]) {
         result.push(player.playerName);
+        console.log(result);
       }
     });
 
@@ -37,9 +43,10 @@ function Answer({ playerList, numberOfRounds, correctAnswer }: Props) {
   };
 
   useEffect(() => {
+    localStorage.setItem("playerList", JSON.stringify(playerList));
+    localStorage.setItem("correctAnswer", JSON.stringify(correctAnswer));
     getWinnerList();
-  }, [correctAnswer]);
-
+  }, [correctAnswer, playerList]);
   const handleSummary = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -77,7 +84,7 @@ function Answer({ playerList, numberOfRounds, correctAnswer }: Props) {
                   Result: {correctAnswer[index]}
                 </p>
                 <div className="text-lg flex-row flex">
-                  Winner: {winners?.[index]?.playerName || "Empty"}
+                  Winner: <p>{winners[index] || "Empty"}</p>
                 </div>
               </div>
             </div>

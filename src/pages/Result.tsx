@@ -1,11 +1,12 @@
 import React from "react";
 import { Istate as Props } from "../App";
 import { Button, Table } from "antd";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-interface Irops {
+interface Iprops {
   playerList: Props["playerList"];
   correctAnswer: Props["correctAnswer"];
+  setPlayerList: React.Dispatch<React.SetStateAction<Props["playerList"]>>;
 }
 interface IData {
   id: number;
@@ -15,26 +16,57 @@ interface IData {
   results: string[];
   score: number;
 }
-function Result({ playerList, correctAnswer }: Props) {
+function Result({ playerList, correctAnswer, setPlayerList }: Iprops) {
   const navigate = useNavigate();
-  const [score, setScore] = useState({
-    name: "",
-    score: 0,
-    count: 0,
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const calculateScore = (
+    answers: string[],
+    correctAnswers: string[]
+  ): number => {
+    let score = 0;
+    for (let i = 0; i < answers.length; i++) {
+      if (answers[i] === correctAnswers[i]) {
+        score++;
+      }
+    }
+    return score;
+  };
+
+  useEffect(() => {
+    const storedPlayerList = localStorage.getItem("playerList");
+    if (storedPlayerList) {
+      setPlayerList(JSON.parse(storedPlayerList));
+    }
+  }, []);
+  const data: IData[] = playerList.map((player, index) => {
+    const score = calculateScore(player.answer, correctAnswer);
+    return {
+      id: index + 1,
+      playerName: player.playerName,
+      createAt: player.createdAt,
+      answers: player.answer,
+      results: correctAnswer,
+      score: score,
+    };
   });
+
+  const filteredData: IData[] = playerList
+    .map((player, index) => {
+      const score = calculateScore(player.answer, correctAnswer);
+      return {
+        id: index + 1,
+        playerName: player.playerName,
+        createAt: player.createdAt,
+        answers: player.answer,
+        results: correctAnswer,
+        score: score,
+      };
+    })
+    .filter((item) => item.playerName.includes(searchQuery));
   const handleAgain = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     localStorage.clear();
-
     navigate("/");
   };
-  const data: IData[] = playerList.map((player, index) => ({
-    id: index + 1,
-    playerName: player.playerName,
-    createAt: player.createdAt,
-    answers: player.answer,
-    results: correctAnswer,
-    score: player.score,
-  }));
   const columns = [
     {
       title: "No.",
@@ -80,6 +112,33 @@ function Result({ playerList, correctAnswer }: Props) {
       },
     },
   ];
+
+  const summaryColumns = [
+    {
+      title: "Summary",
+      dataIndex: "playerName",
+    },
+    {
+      title: "Correct percent",
+      dataIndex: "score",
+      render: (score: number) => {
+        const percent = (score / correctAnswer.length) * 100;
+        return `${percent.toFixed(2)}%`;
+      },
+      sorter: {
+        compare: (a: IData, b: IData) => a.score - b.score,
+        multiple: 1,
+      },
+    },
+    {
+      title: "Total score",
+      dataIndex: "score",
+      sorter: {
+        compare: (a: IData, b: IData) => a.score - b.score,
+        multiple: 1,
+      },
+    },
+  ];
   return (
     <>
       <div className="p-2 w-screen flex flex-col gap-8">
@@ -91,11 +150,18 @@ function Result({ playerList, correctAnswer }: Props) {
           <label>Search:</label>
           <input
             placeholder="Player's name"
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-[300px] border-[1px] border-black rounded-md px-2 py-2 outline-none"
           ></input>
         </div>
         <div className="p-10">
-          <Table columns={columns} dataSource={data}></Table>
+          <Table
+            columns={columns}
+            dataSource={searchQuery ? filteredData : data}
+          ></Table>
+        </div>
+        <div className="p-10 w-1/2">
+          <Table columns={summaryColumns} dataSource={data}></Table>
         </div>
         <button
           onClick={(e) => handleAgain(e)}

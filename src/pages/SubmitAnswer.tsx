@@ -1,64 +1,80 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Istate as Props } from "../App";
 import { useNavigate } from "react-router";
-import { getResult } from "../apis";
+import axios from "axios";
 
 interface Iprops {
   playerList: Props["playerList"];
   numberOfRounds: Props["numberOfRounds"];
+  setPlayerList: React.Dispatch<React.SetStateAction<Props["playerList"]>>;
+  correctAnswer: Props["correctAnswer"];
   setCorrectAnswer: React.Dispatch<
     React.SetStateAction<Props["correctAnswer"]>
   >;
-  correctAnswer: Props["correctAnswer"];
-  setPlayerList: React.Dispatch<React.SetStateAction<Props["playerList"]>>;
 }
 
 function SubmitAnswer({
   playerList,
   numberOfRounds,
-  setCorrectAnswer,
-  correctAnswer,
   setPlayerList,
+  correctAnswer,
+  setCorrectAnswer,
 }: Iprops) {
   const navigate = useNavigate();
   const [playerIndex, setPlayerIndex] = useState<number>(0);
-  const rounds = Array.from(Array(numberOfRounds).keys());
-  const [userResponse, setUserResponse] = useState(
-    rounds.map((index) => ({ index, response: "" }))
+  const [userResponse, setUserResponse] = useState<string[]>(
+    Array.from({ length: numberOfRounds }, () => "Empty")
   );
-
-  const handleClick = (index: number, response: string) => {
-    const updatedUserResponse = [...userResponse];
-    updatedUserResponse[index] = { index: index, response: response };
-    setUserResponse(updatedUserResponse);
-
-    const updatedPlayerList = [...playerList]; //get a copy array
-    const currentPlayer = updatedPlayerList[playerIndex]; //choose the current player
-    currentPlayer.answer = [...currentPlayer.answer];
-    currentPlayer.answer[index] = response;
-    updatedPlayerList[playerIndex] = currentPlayer;
-    setPlayerList(updatedPlayerList);
+  const rounds = Array.from(Array(numberOfRounds).keys());
+  console.log(playerIndex);
+  const getAnswers = async () => {
+    try {
+      const responses = await Promise.all(
+        rounds.map(() => axios.get("https://yesno.wtf/api"))
+      );
+      const data = responses.map((response) =>
+        response.data.answer.toUpperCase()
+      );
+      setCorrectAnswer(data);
+      setPlayerList((prevList) =>
+        prevList.map((player, index) => ({
+          ...player,
+          result: data[index],
+        }))
+      );
+    } catch (error) {
+      console.log(error);
+    }
   };
+  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (playerIndex < playerList.length - 1) {
+      const updatedPlayerList = [...playerList];
+      updatedPlayerList[playerIndex].answer = userResponse;
+      setPlayerList(updatedPlayerList);
 
-  const handleSubmit = async () => {
-    const nextPlayerIndex = (playerIndex + 1) % playerList.length;
-    setPlayerIndex(nextPlayerIndex);
+      setPlayerIndex(playerIndex + 1);
+      setUserResponse(Array.from({ length: numberOfRounds }, () => "Empty"));
+    } else {
+      const updatedPlayerList = [...playerList];
+      updatedPlayerList[playerIndex].answer = userResponse;
+      setPlayerList(updatedPlayerList);
 
-    if (nextPlayerIndex === 0) {
-      try {
-        const correctAnswers: string[] = [];
-        for (let i = 0; i < rounds.length; i++) {
-          const answer = await getResult();
-          correctAnswers.push(answer);
-        }
-        setCorrectAnswer(correctAnswers);
-        navigate("/answer");
-      } catch (error) {
-        console.log(error);
-        alert(
-          "An error occurred while fetching the data. Please try again later."
-        );
-      }
+      setPlayerIndex(0);
+      setUserResponse(Array.from({ length: numberOfRounds }, () => "Empty"));
+
+      getAnswers();
+      navigate("/answer");
+    }
+  };
+  console.log(playerList);
+  const handleChoice = (index: number, choice: string) => {
+    let newList = [...userResponse];
+    if (userResponse[index] === choice) {
+      newList[index] = "Empty";
+      setUserResponse(newList);
+    } else {
+      newList[index] = choice.toUpperCase();
+      setUserResponse(newList);
     }
   };
 
@@ -87,14 +103,14 @@ function SubmitAnswer({
                       <div className="flex flex-row justify-between">
                         <button
                           className="w-[49%] text-green-500 text-lg px-2 py-1 border-2 border-black"
-                          onClick={() => handleClick(index, "Yes")}
+                          onClick={() => handleChoice(index, "Yes")}
                         >
                           <i className="fa-solid fa-check mr-2"></i>
                           Yes
                         </button>
                         <button
                           className="w-[49%] text-red-500 text-lg px-2 py-1 border-2 border-black"
-                          onClick={() => handleClick(index, "No")}
+                          onClick={() => handleChoice(index, "No")}
                         >
                           <i className="fa-solid fa-xmark mr-2"></i>
                           No
@@ -104,7 +120,7 @@ function SubmitAnswer({
                   ))}
                 </div>
                 <button
-                  onClick={handleSubmit}
+                  onClick={(e) => handleSubmit(e)}
                   className="text-lg py-1 px-4 bg-black text-white mx-auto w-full sm:w-1/4"
                 >
                   Submit Answer

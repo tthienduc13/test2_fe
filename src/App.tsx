@@ -12,14 +12,13 @@ export interface Istate {
     answer: string[];
     createdAt: string;
     score: number;
+    result: string[];
   }[];
   numberOfRounds: number;
   correctAnswer: string[];
 }
 function App() {
-  const [playerList, setPlayerList] = useState<Istate["playerList"]>(
-    JSON.parse(localStorage.getItem("playerList") || "[]")
-  );
+  const [playerList, setPlayerList] = useState<Istate["playerList"]>([]);
   const [numberOfRounds, setNumberOfRounds] = useState<
     Istate["numberOfRounds"]
   >(Number(""));
@@ -52,9 +51,9 @@ function App() {
             <SubmitAnswer
               numberOfRounds={numberOfRounds}
               playerList={playerList}
-              setCorrectAnswer={setCorrectAnswer}
-              correctAnswer={correctAnswer}
               setPlayerList={setPlayerList}
+              correctAnswer={correctAnswer}
+              setCorrectAnswer={setCorrectAnswer}
             ></SubmitAnswer>
           }
         ></Route>
@@ -65,6 +64,8 @@ function App() {
               playerList={playerList}
               correctAnswer={correctAnswer}
               numberOfRounds={numberOfRounds}
+              setPlayerList={setPlayerList}
+              setCorrectAnswer={setCorrectAnswer}
             ></Answer>
           }
         ></Route>
@@ -74,7 +75,7 @@ function App() {
             <Result
               playerList={playerList}
               correctAnswer={correctAnswer}
-              numberOfRounds={numberOfRounds}
+              setPlayerList={setPlayerList}
             ></Result>
           }
         ></Route>

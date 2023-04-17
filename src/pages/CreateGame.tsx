@@ -45,7 +45,7 @@ function CreateGame({
         new Date().toLocaleTimeString();
       setPlayerList([
         ...playerList,
-        { playerName: player, answer: [], score: 0, createdAt },
+        { playerName: player, answer: [], score: 0, createdAt, result: [] },
       ]);
       setPlayer("");
       setShowPlayerTable(!showPlayerTable);
