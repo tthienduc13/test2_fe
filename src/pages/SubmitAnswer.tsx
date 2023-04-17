@@ -25,6 +25,10 @@ function SubmitAnswer({
   const [userResponse, setUserResponse] = useState<string[]>(
     Array.from({ length: numberOfRounds }, () => "Empty")
   );
+
+  const [selectedChoices, setSelectedChoices] = useState<string[]>(
+    Array(numberOfRounds).fill("")
+  );
   const rounds = Array.from(Array(numberOfRounds).keys());
   console.log(playerIndex);
   const getAnswers = async () => {
@@ -51,7 +55,7 @@ function SubmitAnswer({
       const updatedPlayerList = [...playerList];
       updatedPlayerList[playerIndex].answer = userResponse;
       setPlayerList(updatedPlayerList);
-
+      setSelectedChoices([]);
       setPlayerIndex(playerIndex + 1);
       setUserResponse(Array.from({ length: numberOfRounds }, () => "Empty"));
     } else {
@@ -68,6 +72,11 @@ function SubmitAnswer({
   };
   console.log(playerList);
   const handleChoice = (index: number, choice: string) => {
+    setSelectedChoices((prevSelectedChoices) => {
+      const newSelectedChoices = [...prevSelectedChoices];
+      newSelectedChoices[index] = choice;
+      return newSelectedChoices;
+    });
     let newList = [...userResponse];
     if (userResponse[index] === choice) {
       newList[index] = "Empty";
@@ -102,14 +111,22 @@ function SubmitAnswer({
                       <span>Round {index + 1}:</span>
                       <div className="flex flex-row justify-between">
                         <button
-                          className="w-[49%] text-green-500 text-lg px-2 py-1 border-2 border-black"
+                          className={`w-[49%] text-lg px-2 py-1 border-2 border-black ${
+                            selectedChoices[index] === "Yes"
+                              ? "bg-green-500 text-white"
+                              : ""
+                          }`}
                           onClick={() => handleChoice(index, "Yes")}
                         >
                           <i className="fa-solid fa-check mr-2"></i>
                           Yes
                         </button>
                         <button
-                          className="w-[49%] text-red-500 text-lg px-2 py-1 border-2 border-black"
+                          className={`w-[49%] text-lg px-2 py-1 border-2 border-black ${
+                            selectedChoices[index] === "No"
+                              ? "bg-red-500 text-white"
+                              : ""
+                          }`}
                           onClick={() => handleChoice(index, "No")}
                         >
                           <i className="fa-solid fa-xmark mr-2"></i>
