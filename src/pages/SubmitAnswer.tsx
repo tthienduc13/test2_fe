@@ -23,7 +23,7 @@ function SubmitAnswer({
   const navigate = useNavigate();
   const [playerIndex, setPlayerIndex] = useState<number>(0);
   const [userResponse, setUserResponse] = useState<string[]>(
-    Array.from({ length: numberOfRounds }, () => "Empty")
+    Array(numberOfRounds)
   );
 
   const [selectedChoices, setSelectedChoices] = useState<string[]>(
