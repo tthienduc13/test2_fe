@@ -5,19 +5,9 @@ import { Istate as Props } from "../App";
 interface Iprops {
   playerList: Props["playerList"];
   numberOfRounds: Props["numberOfRounds"];
-  setPlayerList: React.Dispatch<React.SetStateAction<Props["playerList"]>>;
   correctAnswer: Props["correctAnswer"];
-  setCorrectAnswer: React.Dispatch<
-    React.SetStateAction<Props["correctAnswer"]>
-  >;
 }
-function Answer({
-  playerList,
-  numberOfRounds,
-  setPlayerList,
-  correctAnswer,
-  setCorrectAnswer,
-}: Iprops) {
+function Answer({ playerList, numberOfRounds, correctAnswer }: Iprops) {
   const navigate = useNavigate();
   const rounds = Array.from(Array(numberOfRounds).keys());
   const [winners, setWinners] = useState<string[]>([]);
@@ -28,7 +18,6 @@ function Answer({
     }
     setWinners(matches);
   };
-  console.log(playerList[0].answer);
   const getCurrentWinner = (i: number) => {
     const result: string[] = [];
     playerList.map((player) => {

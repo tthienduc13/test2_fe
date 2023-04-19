@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState } from "react";
 import { Istate as Props } from "../App";
 import { useNavigate } from "react-router";
 import axios from "axios";
@@ -7,7 +7,6 @@ interface Iprops {
   playerList: Props["playerList"];
   numberOfRounds: Props["numberOfRounds"];
   setPlayerList: React.Dispatch<React.SetStateAction<Props["playerList"]>>;
-  correctAnswer: Props["correctAnswer"];
   setCorrectAnswer: React.Dispatch<
     React.SetStateAction<Props["correctAnswer"]>
   >;
@@ -17,20 +16,18 @@ function SubmitAnswer({
   playerList,
   numberOfRounds,
   setPlayerList,
-  correctAnswer,
   setCorrectAnswer,
 }: Iprops) {
   const navigate = useNavigate();
   const [playerIndex, setPlayerIndex] = useState<number>(0);
   const [userResponse, setUserResponse] = useState<string[]>(
-    Array(numberOfRounds)
+    Array(numberOfRounds).fill("Empty")
   );
-
   const [selectedChoices, setSelectedChoices] = useState<string[]>(
     Array(numberOfRounds).fill("")
   );
   const rounds = Array.from(Array(numberOfRounds).keys());
-  console.log(playerIndex);
+
   const getAnswers = async () => {
     try {
       const responses = await Promise.all(
@@ -47,44 +44,40 @@ function SubmitAnswer({
         }))
       );
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
+
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const updatedPlayerList = [...playerList];
+    updatedPlayerList[playerIndex].answer = userResponse;
+    const emptyResponses = Array.from(
+      { length: numberOfRounds },
+      () => "Empty"
+    );
+    setUserResponse(emptyResponses);
+
     if (playerIndex < playerList.length - 1) {
-      const updatedPlayerList = [...playerList];
-      updatedPlayerList[playerIndex].answer = userResponse;
-      setPlayerList(updatedPlayerList);
       setSelectedChoices([]);
       setPlayerIndex(playerIndex + 1);
-      setUserResponse(Array.from({ length: numberOfRounds }, () => "Empty"));
     } else {
-      const updatedPlayerList = [...playerList];
-      updatedPlayerList[playerIndex].answer = userResponse;
-      setPlayerList(updatedPlayerList);
-
       setPlayerIndex(0);
-      setUserResponse(Array.from({ length: numberOfRounds }, () => "Empty"));
-
       getAnswers();
       navigate("/answer");
     }
   };
-  console.log(playerList);
+
   const handleChoice = (index: number, choice: string) => {
     setSelectedChoices((prevSelectedChoices) => {
       const newSelectedChoices = [...prevSelectedChoices];
       newSelectedChoices[index] = choice;
       return newSelectedChoices;
     });
-    let newList = [...userResponse];
-    if (userResponse[index] === choice) {
-      newList[index] = "Empty";
-      setUserResponse(newList);
-    } else {
-      newList[index] = choice.toUpperCase();
-      setUserResponse(newList);
-    }
+
+    const newList = [...userResponse];
+    newList[index] =
+      userResponse[index] === choice ? "Empty" : choice.toUpperCase();
+    setUserResponse(newList);
   };
 
   return (

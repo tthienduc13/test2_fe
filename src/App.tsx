@@ -52,7 +52,6 @@ function App() {
               numberOfRounds={numberOfRounds}
               playerList={playerList}
               setPlayerList={setPlayerList}
-              correctAnswer={correctAnswer}
               setCorrectAnswer={setCorrectAnswer}
             ></SubmitAnswer>
           }
@@ -64,8 +63,7 @@ function App() {
               playerList={playerList}
               correctAnswer={correctAnswer}
               numberOfRounds={numberOfRounds}
-              setPlayerList={setPlayerList}
-              setCorrectAnswer={setCorrectAnswer}
+
             ></Answer>
           }
         ></Route>

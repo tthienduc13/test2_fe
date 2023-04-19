@@ -1,6 +1,6 @@
 import React from "react";
 import { Istate as Props } from "../App";
-import { Button, Table } from "antd";
+import { Table } from "antd";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 interface Iprops {

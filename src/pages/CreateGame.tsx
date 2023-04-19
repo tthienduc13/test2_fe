@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Istate as Props } from "../App";
 import { useNavigate } from "react-router";
 import { isValidInput, isValidNumberOfRounds } from "../utils";
@@ -63,7 +63,7 @@ function CreateGame({
     if (playerList.length === 2 && isValidNumberOfRounds(numberOfRounds)) {
       navigate("/submit-answer");
     } else if (!isValidNumberOfRounds(numberOfRounds)) {
-      alert("Please enter a number!");
+      alert("Please enter a number between 0 and 10!");
     }
   };
 
