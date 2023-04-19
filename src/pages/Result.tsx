@@ -156,12 +156,17 @@ function Result({ playerList, correctAnswer, setPlayerList }: Iprops) {
         </div>
         <div className="p-10">
           <Table
+            pagination={false}
             columns={columns}
             dataSource={searchQuery ? filteredData : data}
           ></Table>
         </div>
         <div className="p-10 w-1/2">
-          <Table columns={summaryColumns} dataSource={data}></Table>
+          <Table
+            pagination={false}
+            columns={summaryColumns}
+            dataSource={data}
+          ></Table>
         </div>
         <button
           onClick={(e) => handleAgain(e)}

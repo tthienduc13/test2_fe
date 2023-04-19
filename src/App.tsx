@@ -18,7 +18,9 @@ export interface Istate {
   correctAnswer: string[];
 }
 function App() {
-  const [playerList, setPlayerList] = useState<Istate["playerList"]>([]);
+  const [playerList, setPlayerList] = useState<Istate["playerList"]>(
+    JSON.parse(`${localStorage.getItem("playerList")}`) || []
+  );
   const [numberOfRounds, setNumberOfRounds] = useState<
     Istate["numberOfRounds"]
   >(Number(""));
@@ -60,10 +62,11 @@ function App() {
           path="/answer"
           element={
             <Answer
+              setCorrectAnswer={setCorrectAnswer}
+              setPlayerList={setPlayerList}
               playerList={playerList}
               correctAnswer={correctAnswer}
               numberOfRounds={numberOfRounds}
-
             ></Answer>
           }
         ></Route>

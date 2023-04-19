@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { isValidInput, isValidNumberOfRounds } from "../utils";
 import AddPlayerTable from "../components/AddPlayerTable";
 import ShowPlayerTable from "../components/ShowPlayerTable";
+
 interface Iprops {
   playerList: Props["playerList"];
   setPlayerList: React.Dispatch<React.SetStateAction<Props["playerList"]>>;
@@ -12,6 +13,7 @@ interface Iprops {
     React.SetStateAction<Props["numberOfRounds"]>
   >;
 }
+
 function CreateGame({
   playerList,
   setPlayerList,
@@ -20,23 +22,29 @@ function CreateGame({
 }: Iprops) {
   const navigate = useNavigate();
   const [player, setPlayer] = useState<string>("");
-  const [showPlayerTable, setShowPlayerTable] = useState<boolean>(false);
-  const [showAddPlayerTable, setShowAddPlayerTable] = useState<boolean>(true);
+  const [showPlayerTable, setShowPlayerTable] = useState<boolean>(
+    playerList.length >= 2
+  );
+  const [showAddPlayerTable, setShowAddPlayerTable] = useState<boolean>(
+    playerList.length < 2
+  );
+
   const handleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPlayer(e.target.value);
   };
+
   const handleAdd = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     addPlayer();
   };
+
   const handleAddMore = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
-    if (playerList.length < 2) {
-      setShowPlayerTable(!showPlayerTable);
-      setShowAddPlayerTable(!showAddPlayerTable);
-    }
+    setShowPlayerTable(!showPlayerTable);
+    setShowAddPlayerTable(!showAddPlayerTable);
   };
+
   const addPlayer = () => {
     if (isValidInput(player) && playerList.length < 2) {
       const createdAt =
@@ -56,6 +64,7 @@ function CreateGame({
       alert("Player's name is not valid!");
     }
   };
+
   const handleStartGame = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -64,6 +73,9 @@ function CreateGame({
       navigate("/submit-answer");
     } else if (!isValidNumberOfRounds(numberOfRounds)) {
       alert("Please enter a number between 0 and 10!");
+    } else if (playerList.length === 2) {
+      setShowPlayerTable(true);
+      setShowAddPlayerTable(false);
     }
   };
 
